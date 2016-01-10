@@ -1,0 +1,27 @@
+apiVersion: v1                  #目前kubernetes的版本为V1.0.3
+kind: ReplicationController     #表示类型，一般有Pod，ReplicationController，Service
+metadata:                       #属性：一般定义kind类型的名字，和标签。标签标识在该RC的labels
+  name: redis-master            
+  labels:
+    name: redis-master
+spec:                           #既specification，表示规范。
+  replicas: 1                   #replicas: num ，num表示RC复制pod副本的数量。使整个pod的数量维持在num数。
+  selector:                     #标签选择器。表示会以spec.selector.name对模版template.metadata.labels.name进行监控。
+    name: redis-master          
+  template:                     #模版，表示需要创建pod的模版。
+    metadata:                   #首先是给要创建的模版创建属性。属性包含标签名。
+      labels:
+        name: redis-master
+    spec:                       #pod模版的规范
+      containers:               #容器：包含容器image和定义的name。开放的port。
+      - name: master
+        image: kubeguide/redis-master
+        ports:
+        - containerPort: 6379
+      volumes:                      #定义存储卷。
+      - name: "persistent-storage"  #存储卷名称，可以定义多个挂在点。
+        hostPath:
+          path: "/data"         #在Pod中挂在宿主机上的文件或目录。
+        VolumeMounts:           #表示挂在到pod容器中。
+        - name: "persistent-storage"    
+          mountPath: "/mnt"    #挂载到pod容器中的位置。
