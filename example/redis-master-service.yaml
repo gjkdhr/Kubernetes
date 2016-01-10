@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service               #创建的为Service
+metadata:                   #Service的属性。 包含Service的name和labels
+  name: redis-master
+  labels:
+    name: redis-master
+spec:                       #规范。
+  ports:                    #端口规范。
+  - port: 6379              #port表示service的虚拟端口。因为在生成service时，kubernetes会自动创建Cluseter IP:Port映射到该虚拟port中。
+    targetPort: 6379        #targetPort表示提供该服务的容器所expose的端口。
+  selector:                 #这个很重要，因为service需要找到所对应的pod后端。所以需要通过selector.name来找到pod，既我们定义的redis-master pod
+    name: redis-master
