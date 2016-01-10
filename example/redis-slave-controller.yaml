@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: redis-slave
+  labels:
+    name: redis-slave
+spec:
+  replicas: 2                   #表示slave复制控制器需要复制的num数，该实例是通过2个redis-slave来进行读操作的。
+  selector:
+    name: redis-slave
+  template:                     #RC所监控的模版。
+    metadata:
+      labels: 
+        name: redis-slave
+    spec:                       #RC定义的规范
+      containers:               #containers的定义，可以有多个container定义。
+      - name: slave 
+        image: kubeguide/guestbook-redis-slave
+        env:                    #由于redis-master-service是在创建服务之后由kubernetes系统自动分配的Service IP。后面创建的pod是无法自动获取到该IP的，
+                                #所以需要通过一个机制来找到这个服务。k8s利用linux系统的环境变量（Environment Variable）,在每个pod中都增加了一组service                                #相关的环境变量，用来记录从服务名到Service IP的映射关系。 像下面注释的两条变量                           
+        - name: GET_HOSTS_FROM  #   REDIS_MASTER_SERVICE_HOST=`kubectl get service redis-master`获取到该IP，也可以通过docker exec进入redis-master启动
+                                #的pod容器中查看该变量。
+          value: env            #我们从环境变量来获取redis-master的相关变量。还是不太熟，后面修改。
+        ports:
+        - containerPort: 6379   #容器开放的端口。Service的话，直接port/targetPort
