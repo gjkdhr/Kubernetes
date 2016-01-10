@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: development            #创建的pod属于development命名空间。通过kubectl get pod --namespace=development来查看development命名空间下的pod。
+spec:
+  containers:
+  - name: busybox
+    image: docker.io/busybox:latest
+    command:                        #在创建pod时，所执行的命令。
+      - sleep
+      - "3600"  
+
+#使用不同的namespace可以实现对用户的分组，既“多租户”管理。
+#对不同的租户还可以进行单独的资源配额设置和管理。使得整个集群的资源配置非常灵活方便。
