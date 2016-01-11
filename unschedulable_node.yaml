@@ -18,7 +18,8 @@ spec:
 #10.100.100.12   kubernetes.io/hostname=10.100.100.12   Ready,SchedulingDisabled 显示调度失败，在后面创建的pod中，kube-master将不会往该节点分配创建pod
 #10.100.100.20   kubernetes.io/hostname=10.100.100.20   Ready
 #
-#
+#当我们需要关闭隔离主机上已经创建的pod时，我们可以stop在当前隔离主机上的pod所创建的container，
+#kube-master会自动根据节点情况，在其他主机调度生成新的pod.
 #如果要恢复该节点，只需要将unscheduable设置为false并重新加入就可以了。
 #[root@centos7 ~]# kubectl replace -f unschedulable_node.yaml 
 #nodes/10.100.100.12
