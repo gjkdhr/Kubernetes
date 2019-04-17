@@ -29,6 +29,7 @@ nginx-deployment-569d6cfdd8-sklpl   1/1     Running   0          49m
 Controlled By:      ReplicaSet/nginx-deployment-569d6cfdd8
 
 查看RS集合，发现nginx-deployment-569d6cfdd8是一个ReplicatSet controll manager
+您可能会注意到 ReplicaSet 的名字总是<Deployment的名字>-<pod template的hash值>。
 [root@Master-K8S-Test ~]# kubectl get rs
 NAME                          DESIRED   CURRENT   READY   AGE
 nginx-deployment-569d6cfdd8   3         3         3       52m
@@ -71,5 +72,12 @@ nginx-deployment-589b765bc-fw4l5   1/1     Running   0          7m58s
 nginx-deployment-589b765bc-mjcb5   1/1     Running   0          7m58s
 nginx-deployment-589b765bc-mvrvn   1/1     Running   0          7m58s
 
-https://blog.csdn.net/ucsheep/article/details/81781509
-https://www.cnblogs.com/xzkzzz/p/9546869.html
+在RS级别上发生的事件，均是对pod的操作，创建pod，删除pod.
+在deployment级别上发生的事件一般是创建服务、滚动升级一个服务，或者是操作RS伸缩Pod集群
+
+
+Pod-template-hash label
+注意上面示例输出中的 pod label 里的 pod-template-hash label。当 Deployment 创建或者接管 ReplicaSet 时，
+Deployment controller 会自动为 Pod 添加 pod-template-hash label。这样做的目的是防止 Deployment 的子ReplicaSet 的 pod 名字重复。
+通过将 ReplicaSet 的 PodTemplate 进行哈希散列，使用生成的哈希值作为 label 的值，
+并添加到 ReplicaSet selector 里、 pod template label 和 ReplicaSet 管理中的 Pod 上。
