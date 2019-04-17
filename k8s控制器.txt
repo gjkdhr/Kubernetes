@@ -1,0 +1,75 @@
+Deployment与RS(ReplicaSet),Pod之间的关系；
+
+                                Deployment
+                                    |
+                                    |
+                                    |
+                            ————————————————————
+                            |                   |
+                            |                   |
+                        ReplicaSet          ReplicaSet
+                            |
+                            |
+                            |
+                    ————————————————————
+                    |         |         |
+                    |         |         |
+                    |         |         |
+                   Pod       Pod       Pod
+
+在查看pod时，可以发现nginx-deployment-569d6cfdd8是一致的；
+[root@Master-K8S-Test ~]# kubectl get pod
+NAME                                READY   STATUS    RESTARTS   AGE
+nginx-deployment-569d6cfdd8-8hmbc   1/1     Running   0          49m
+nginx-deployment-569d6cfdd8-cf85s   1/1     Running   0          49m
+nginx-deployment-569d6cfdd8-sklpl   1/1     Running   0          49m
+
+也可以通过kubectl describe pods/Pod-NAME 来查看；
+[root@Master-K8S-Test ~]# kubectl describe pod/nginx-deployment-569d6cfdd8-8hmbc
+Controlled By:      ReplicaSet/nginx-deployment-569d6cfdd8
+
+查看RS集合，发现nginx-deployment-569d6cfdd8是一个ReplicatSet controll manager
+[root@Master-K8S-Test ~]# kubectl get rs
+NAME                          DESIRED   CURRENT   READY   AGE
+nginx-deployment-569d6cfdd8   3         3         3       52m
+nginx-deployment-745f4ff596   0         0         0       54m
+nginx-deployment-98cbfd5f4    0         0         0       94m
+
+查看nginx-deployment-98cbfd5f4控制器的详细信息；
+kubectl describe rs/nginx-deployment-569d6cfdd8
+Controlled By:  Deployment/nginx-deployment
+
+因此可以确认，Deployment控制器在创建Pod时，先创建了ReplicaSet控制器，
+再由ReplicaSet控制器创建了Pod。
+
+例如我们通过Deployment控制器来新建Pod；
+[root@Master-K8S-Test Kubernetes]# kubectl describe deployment/nginx-deployment
+OldReplicaSets:  <none>
+NewReplicaSet:   nginx-deployment-589b765bc (3/3 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  31s   deployment-controller  Scaled up replica set nginx-deployment-589b765bc to 3
+
+可以发现新建了一个ScalingReplicaSet控制器nginx-deployment-589b765bc
+[root@Master-K8S-Test Kubernetes]# kubectl get rs
+NAME                         DESIRED   CURRENT   READY   AGE
+nginx-deployment-589b765bc   3         3         3       9m2s
+
+我们查看nginx-deployment-589b765bc控制器，发现该控制器创建了3个Pod；
+kubectl describe rs/nginx-deployment-589b765bc
+Events:
+  Type    Reason            Age    From                   Message
+  ----    ------            ----   ----                   -------
+  Normal  SuccessfulCreate  9m19s  replicaset-controller  Created pod: nginx-deployment-589b765bc-mvrvn
+  Normal  SuccessfulCreate  9m19s  replicaset-controller  Created pod: nginx-deployment-589b765bc-fw4l5
+  Normal  SuccessfulCreate  9m19s  replicaset-controller  Created pod: nginx-deployment-589b765bc-mjcb5
+
+[root@Master-K8S-Test Kubernetes]# kubectl get pods
+NAME                               READY   STATUS    RESTARTS   AGE
+nginx-deployment-589b765bc-fw4l5   1/1     Running   0          7m58s
+nginx-deployment-589b765bc-mjcb5   1/1     Running   0          7m58s
+nginx-deployment-589b765bc-mvrvn   1/1     Running   0          7m58s
+
+https://blog.csdn.net/ucsheep/article/details/81781509
+https://www.cnblogs.com/xzkzzz/p/9546869.html
