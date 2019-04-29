@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard-volume
+  namespace: test
+  labels:
+    mark: kuard-volume
+spec:
+  containers:
+  - image: gcr.io/kuar-demo/kuard-amd64:1
+    name: kuard
+    imagePullPolicy: IfNotPresent
+    ports:
+    - name: http
+      containerPort: 8080
+      protocol: TCP
+    volumeMounts:
+    - name: kuard-data
+      mountPath: /gjkdhr
+  volumes:
+  - name: "kuard-data"
+    hostPath:
+      path: "/mnt/k8s_volume_test/" 
+      type: Directory

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard-resource
+  namespace: test
+  labels:
+    mark: kuard-resource
+spec:
+  containers:
+  - image: gcr.io/kuar-demo/kuard-amd64:1
+    name: kuard-resource
+    imagePullPolicy: IfNotPresent
+    ports:
+    - name: http
+      containerPort: 8080
+      protocol: TCP
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "128Mi"
