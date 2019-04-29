@@ -1,0 +1,31 @@
+#当我们需要对主机进行硬件升级，硬件维护的时候，我们需要停止kube-master继续往该node上调度创建新的Pod.
+apiVersion: v1
+kind: Node              #因为我们要隔离node节点，所以我们需要制定操作对象为node节点类型
+metadata:
+  name: 10.100.100.12   #通过kubectl get nodes来确定需要隔离的node节点名，例如我们隔离节点node,这块填写主机名。
+  labels:
+    kubernetes.io/hostname: 10.100.100.12       #该标签就是我们需要隔离节点的LABELS,
+spec:       
+  unschedulable: false   #unscheduable，意思就是脱离调度。我们定义为true。
+                        #当我们要恢复该节点时，只需要将unschedulable设置为false
+
+
+#在kube-master执行命令。
+#[root@centos7 ~]# kubectl replace -f unschedulable_node.yaml 
+#nodes/10.100.100.12
+#[root@centos7 ~]# kubectl get nodes
+#NAME            LABELS                                 STATUS
+#10.100.100.12   kubernetes.io/hostname=10.100.100.12   Ready,SchedulingDisabled 显示调度失败，在后面创建的pod中，kube-master将不会往该节点分配创建pod
+#10.100.100.20   kubernetes.io/hostname=10.100.100.20   Ready
+#
+#当我们需要关闭隔离主机上已经创建的pod时，我们可以stop在当前隔离主机上的pod所创建的container，
+#kube-master会自动根据节点情况，在其他主机调度生成新的pod.
+#如果要恢复该节点，只需要将unscheduable设置为false并重新加入就可以了。
+#[root@centos7 ~]# kubectl replace -f unschedulable_node.yaml 
+#nodes/10.100.100.12
+#[root@centos7 ~]# kubectl get nodes
+#NAME            LABELS                                 STATUS
+#10.100.100.12   kubernetes.io/hostname=10.100.100.12   Ready
+#10.100.100.20   kubernetes.io/hostname=10.100.100.20   Ready
+
+
