@@ -42,3 +42,4 @@ spec:
     nfs:
       server: 192.168.110.31
       path: "/data/k8s_data"
+
