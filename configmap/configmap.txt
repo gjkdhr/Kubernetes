@@ -1,0 +1,59 @@
+[root@Master-K8S-Test configmap]# kubectl create configmap nginx-config --from-literal=nginx_port=80 --from-literal=server_name=myapp.magedu.com
+configmap/nginx-config created
+[root@Master-K8S-Test configmap]# kubectl get cm
+NAME                              DATA   AGE
+ingress-controller-leader-nginx   0      3d13h
+nginx-config                      2      6s
+[root@Master-K8S-Test configmap]# kubectl describe cm/nginx-config
+Name:         nginx-config
+Namespace:    default
+Labels:       <none>
+Annotations:  <none>
+
+Data
+====
+nginx_port:
+----
+80
+server_name:
+----
+myapp.magedu.com
+Events:  <none>
+[root@Master-K8S-Test configmap]# ls
+[root@Master-K8S-Test configmap]# vim www.conf
+[root@Master-K8S-Test configmap]# kubectl create configmap nginx-www --from-file=./www.conf 
+configmap/nginx-www created
+[root@Master-K8S-Test configmap]# kubectl get cm
+NAME                              DATA   AGE
+ingress-controller-leader-nginx   0      3d13h
+nginx-config                      2      5m32s
+nginx-www                         1      5s
+[root@Master-K8S-Test configmap]# kubectl get cm nginx-www -o yaml
+apiVersion: v1
+data:
+  www.conf: "server {\n\tserver_name\tmyapp.magedu.com;\n\tlisten\t80;\n\troot\t/data/web/html/;\n}\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2019-05-05T06:13:05Z"
+  name: nginx-www
+  namespace: default
+  resourceVersion: "3136828"
+  selfLink: /api/v1/namespaces/default/configmaps/nginx-www
+  uid: d89d6f4b-6efc-11e9-bbd5-00505693cfee
+[root@Master-K8S-Test configmap]# kubectl describe cm/nginx-www
+Name:         nginx-www
+Namespace:    default
+Labels:       <none>
+Annotations:  <none>
+
+Data
+====
+www.conf:
+----
+server {
+  server_name  myapp.magedu.com;
+  listen       80;
+  root         /data/web/html/;
+}
+
+Events:  <none>
