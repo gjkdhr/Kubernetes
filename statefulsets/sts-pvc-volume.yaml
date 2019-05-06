@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sts-nfs-pvc01
+  namespace: test
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: "sts-slow"
+  resources:
+    requests:
+      storage: 4Gi
+
+
