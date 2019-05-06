@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard-emptydir-volume
+  namespace: test
+  labels:
+    mark: kuard
+spec:
+  containers:
+  - image: gcr.io/kuar-demo/kuard-amd64:1
+    name: kuard-emptydir-volume
+    imagePullPolicy: IfNotPresent
+    ports:
+    - name: http
+      containerPort: 8080
+      protocol: TCP
+    volumeMounts:
+    - name: kuard-emptydir-volume
+      mountPath: /gjkdhr
+      readOnly: true
+  volumes:
+  - name: kuard-emptydir-volume
+    emptyDir:
+      medium: ""
+      sizeLimit: 1024Mi
+
+
