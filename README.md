@@ -4,7 +4,7 @@ K8S 一些概念理解文档，也会尝试写一些yaml文件；
 参考链接：
 https://github.com/kubernetes-up-and-running/examples
 
-k8s_volume   与kubernetes存储相关的资源创建;
+volume   与kubernetes存储相关的资源创建;
 
 kuard-emptyDir-volume.yaml	pod创建空目录存储emptyDir的实例;
 
