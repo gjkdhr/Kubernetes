@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-sf
+  namespace: test
+  labels:
+    app: nginx
+spec:
+  clusterIP: "None"
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      name: web
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sts-web
+  namespace: test
+spec:
+  serviceName: nginx-sf
+  replicas: 3
+  selector:   
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      name: nginx
+      namespace: test
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: gcr.io/google_containers/nginx-slim:0.8
+        ports:
+        - containerPort: 80
+          name: nginx-http
+        volumeMounts:
+        - name: nginx-www
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: nginx-www
+#      annotations:
+#        volume.beta.kubernetes.io/storage-class: anything
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: sts-slow
+      resources:
+        requests:
+          storage: 4Gi
